@@ -91,7 +91,7 @@ module Isucari
       register Sinatra::Reloader
     end
 
-    configure do
+    configure :production do
       category_data = {}
       category_children_ids = {}
       CATEGORIES.each do |category|
