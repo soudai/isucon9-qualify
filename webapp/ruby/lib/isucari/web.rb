@@ -354,6 +354,7 @@ module Isucari
         end
       end
 
+      shipment_service_url = get_shipment_service_url
       item_details = items.map do |item|
         seller = get_user_simple_by_id(item['seller_id'])
         if seller.nil?
@@ -406,7 +407,7 @@ module Isucari
           end
 
           ssr = begin
-            api_client.shipment_status(get_shipment_service_url, 'reserve_id' => shipping['reserve_id'])
+            api_client.shipment_status(shipment_service_url, 'reserve_id' => shipping['reserve_id'])
           rescue
             db.query('ROLLBACK')
             halt_with_error 500, 'failed to request to shipment service'
