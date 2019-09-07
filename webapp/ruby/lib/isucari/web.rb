@@ -91,7 +91,6 @@ module Isucari
       register Sinatra::Reloader
 
       category_data = {}
-      category_children_ids = {}
       CATEGORIES.each do |category|
         category_data[category[0]] = {
           'id' => category[0],
@@ -100,12 +99,9 @@ module Isucari
         }
         if category[1] != 0
           category_data[category[0]]['parent_category_name'] = category_data[category[1]]['category_name']
-          category_children_ids[category[1]] = [] unless category_children_ids[category[1]]
-          category_children_ids[category[1]] << category[0]
         end
       end
       set :categories, category_data
-      set :category_children, category_children_ids
     end
 
     set :add_charset, ['application/json']
@@ -268,7 +264,7 @@ module Isucari
       root_category = get_category_by_id(root_category_id)
       halt_with_error 404, 'category not found' if root_category.nil?
 
-      category_ids = settings.category_children[root_category['id']]
+      category_ids = db.xquery('SELECT id FROM `categories` WHERE parent_id = ?', root_category['id']).map { |row| row['id'] }
 
       item_id = params['item_id'].to_i
       created_at = params['created_at'].to_i
@@ -1184,10 +1180,7 @@ module Isucari
       response['user'] = user unless user.nil?
       response['payment_service_url'] = get_payment_service_url
 
-      categories = settings.categories.map do |_, category|
-        category.delete('parent_category_name')
-        category
-      end
+      categories = db.xquery('SELECT * FROM `categories`').to_a
       response['categories'] = categories
 
       response.to_json
