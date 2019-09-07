@@ -6,6 +6,18 @@ require 'mysql2-cs-bind'
 require 'bcrypt'
 require 'isucari/api'
 
+module JSON
+  def encode(value)
+    dump(value)
+  end
+  module_function :encode
+
+  def decode(value)
+    parse(value) rescue nil
+  end
+  module_function :decode
+end
+
 module Isucari
   class Web < Sinatra::Base
     DEFAULT_PAYMENT_SERVICE_URL = 'http://localhost:5555'
@@ -107,8 +119,8 @@ module Isucari
     set :add_charset, ['application/json']
     set :public_folder, File.join(__dir__, '..', '..', 'public')
     set :root, File.join(__dir__, '..', '..')
-    set :session_secret, 'tagomoris'
-    set :sessions, 'key' => 'isucari_session', 'expire_after' => 3600
+    set :session_secret, nil
+    set :sessions, key: 'isucari_session', expire_after: 3600, coder: JSON
 
     helpers do
       def db
