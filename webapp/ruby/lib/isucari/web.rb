@@ -225,8 +225,17 @@ module Isucari
         db.xquery("SELECT * FROM `items` WHERE `status` IN (?, ?) ORDER BY `created_at` DESC, `id` DESC LIMIT #{ITEMS_PER_PAGE + 1}", ITEM_STATUS_ON_SALE, ITEM_STATUS_SOLD_OUT)
       end
 
+      user_ids = items.map do |item|
+        item['seller_id']
+      end.uniq
+      sellers = db.xquery("SELECT id, account_name, num_sell_items FROM `users` WHERE `id` IN (#{user_ids.join(', ')})")
+      sellers_dict = sellers.group_by do |seller|
+        seller['id']
+      end
+
       item_simples = items.map do |item|
-        seller = get_user_simple_by_id(item['seller_id'])
+        # seller = get_user_simple_by_id(item['seller_id'])
+        seller = sellers_dict[item['seller_id']]&.first
         halt_with_error 404, 'seller not found' if seller.nil?
 
         category = get_category_by_id(item['category_id'])
