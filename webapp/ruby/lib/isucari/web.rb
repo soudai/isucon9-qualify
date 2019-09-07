@@ -1180,7 +1180,10 @@ module Isucari
       response['user'] = user unless user.nil?
       response['payment_service_url'] = get_payment_service_url
 
-      categories = db.xquery('SELECT * FROM `categories`').to_a
+      categories = settings.categories.map do |_, category|
+        category.delete('parent_category_name')
+        category
+      end
       response['categories'] = categories
 
       response.to_json
