@@ -89,7 +89,9 @@ module Isucari
     configure :development do
       require 'sinatra/reloader'
       register Sinatra::Reloader
+    end
 
+    configure do
       category_data = {}
       category_children_ids = {}
       CATEGORIES.each do |category|
