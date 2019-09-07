@@ -790,7 +790,7 @@ module Isucari
       seller = get_user
       halt_with_error 404, 'seller not found' if seller.nil?
 
-      transaction_evidence = db.xquery('SELECT * FROM `transaction_evidences` WHERE `item_id` = ?', item_id).first
+      transaction_evidence = db.xquery('SELECT id, seller_id FROM `transaction_evidences` WHERE `item_id` = ?', item_id).first
       halt_with_error 404, 'transaction_evidences not found' if transaction_evidence.nil?
 
       halt_with_error 403, '権限がありません' if transaction_evidence['seller_id'] != seller['id']
@@ -815,7 +815,7 @@ module Isucari
       end
 
       begin
-        transaction_evidence = db.xquery('SELECT * FROM `transaction_evidences` WHERE `id` = ? FOR UPDATE', transaction_evidence['id']).first
+        transaction_evidence = db.xquery('SELECT id, status FROM `transaction_evidences` WHERE `id` = ? FOR UPDATE', transaction_evidence['id']).first
 
         if transaction_evidence.nil?
           db.query('ROLLBACK')
@@ -877,7 +877,7 @@ module Isucari
       seller = get_user
       halt_with_error 404, 'seller not found' if seller.nil?
 
-      transaction_evidence = db.xquery('SELECT * FROM `transaction_evidences` WHERE `item_id` = ?', item_id).first
+      transaction_evidence = db.xquery('SELECT id, seller_id FROM `transaction_evidences` WHERE `item_id` = ?', item_id).first
       halt_with_error 404, 'transaction_evidence not found' if transaction_evidence.nil?
 
       if transaction_evidence['seller_id'] != seller['id']
@@ -904,7 +904,7 @@ module Isucari
       end
 
       begin
-        transaction_evidence = db.xquery('SELECT * FROM `transaction_evidences` WHERE `id` = ? FOR UPDATE', transaction_evidence['id']).first
+        transaction_evidence = db.xquery('SELECT id, status FROM `transaction_evidences` WHERE `id` = ? FOR UPDATE', transaction_evidence['id']).first
 
         if transaction_evidence.nil?
           db.query('ROLLBACK')
@@ -977,7 +977,7 @@ module Isucari
       buyer = get_user
       halt_with_error 404, 'buyer not found' if buyer.nil?
 
-      transaction_evidence = db.xquery('SELECT * FROM `transaction_evidences` WHERE `item_id` = ?', item_id).first
+      transaction_evidence = db.xquery('SELECT id, buyer_id FROM `transaction_evidences` WHERE `item_id` = ?', item_id).first
       halt_with_error 404, 'transaction_evidence not found' if transaction_evidence.nil?
 
       if transaction_evidence['buyer_id'] != buyer['id']
@@ -1004,7 +1004,7 @@ module Isucari
       end
 
       begin
-        transaction_evidence = db.xquery('SELECT * FROM `transaction_evidences` WHERE `item_id` = ? FOR UPDATE', item_id).first
+        transaction_evidence = db.xquery('SELECT id, status FROM `transaction_evidences` WHERE `item_id` = ? FOR UPDATE', item_id).first
 
         if transaction_evidence.nil?
           db.query('ROLLBACK')
@@ -1081,14 +1081,14 @@ module Isucari
       seller = get_user
       halt_with_error 404, 'seller not found' if seller.nil?
 
-      transaction_evidence = db.xquery('SELECT * FROM `transaction_evidences` WHERE `id` = ?', transaction_evidence_id).first
+      transaction_evidence = db.xquery('SELECT id, seller_id FROM `transaction_evidences` WHERE `id` = ?', transaction_evidence_id).first
       halt_with_error 404, 'transaction_evidences not found' if transaction_evidence.nil?
 
       if transaction_evidence['seller_id'] != seller['id']
         halt_with_error 403, '権限がありません'
       end
 
-      shipping = db.xquery('SELECT * FROM `shippings` WHERE `transaction_evidence_id` = ?', transaction_evidence['id']).first
+      shipping = db.xquery('SELECT status, img_binary FROM `shippings` WHERE `transaction_evidence_id` = ?', transaction_evidence['id']).first
       halt_with_error 404, 'shippings not found' if shipping.nil?
 
       if shipping['status'] != SHIPPINGS_STATUS_WAIT_PICKUP && shipping != SHIPPINGS_STATUS_SHIPPING
