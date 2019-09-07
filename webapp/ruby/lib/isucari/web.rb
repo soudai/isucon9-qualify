@@ -1204,9 +1204,6 @@ module Isucari
         halt_with_error 401, 'アカウント名かパスワードが間違えています'
       end
 
-      hashed_password = BCrypt::Password.create(password, cost: BCRYPT_COST)
-      db.xquery('INSERT IGNORE INTO `passwords` (`id`, `hashed_password`) VALUES (?, ?)', user['id'], hashed_password)
-
       session['user_id'] = user['id']
       session['csrf_token'] = SecureRandom.hex(20)
 
