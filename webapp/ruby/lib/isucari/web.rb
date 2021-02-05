@@ -105,7 +105,10 @@ module Isucari
       set :category_children, category_children_ids
     end
 
-    set :add_charset, ['application/json']
+    before do
+      content_type 'application/json'
+    end
+
     set :public_folder, File.join(__dir__, '..', '..', 'public')
     set :root, File.join(__dir__, '..', '..')
     set :session_secret, 'tagomoris'
